@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do List</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+
+</head>
+
+<body>
+
+<header class="header">
+
+    <h1>To Do List</h1>
+
+    <div class="search">
+        <span>🔍</span>
+        <input type="text" placeholder="Search a task...">
+    </div>
+
+    <select class="filter">
+        <option value="">Filter</option>
+        <option value="priority">Priority</option>
+        <option value="deadline">Deadline</option>
+        <option value="status">Status</option>
+    </select>
+
+    <button class="add-task">+ Add </button>
+
+</header>
+
+<main class="task-container">
+
+    <!-- Left side : Task list -->
+    <section class="task-list">
+
+        <!--
+            JavaScript will create the tasks here dynamically.
+
+            Example of one task:
+
+            <article class="task">
+                ...
+            </article>
+        -->
+
+    </section>
+
+
+    <!-- Right side : Selected task details -->
+    <aside class="task-details">
+
+        <h2>Task Details</h2>
+
+        <div class="detail">
+
+            <h3>Name</h3>
+            <p>...</p>
+
+            <h3>Deadline</h3>
+            <p>...</p>
+
+            <h3>Priority</h3>
+            <p>...</p>
+
+            <h3>Description</h3>
+            <p>...</p>
+
+            <h3>Status</h3>
+            <p>...</p>
+
+        </div>
+
+    </aside>
+
+</main>
+
+</body>
+
+</html>

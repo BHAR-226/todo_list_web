@@ -1,0 +1,9 @@
+POST http://localhost:8080/api/tasks
+Content-Type: application/json
+
+{
+  "name": "Learn Spring Boot",
+  "description": "Learn REST API",
+  "deadline": "2026-09-25",
+  "priority": 5
+}
