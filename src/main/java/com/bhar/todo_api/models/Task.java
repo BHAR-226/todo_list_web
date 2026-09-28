@@ -1,16 +1,22 @@
 package com.bhar.todo_api.models;
-
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import java.time.LocalDate;
 
 import static com.bhar.todo_api.models.Statut.Waiting;
+import jakarta.persistence.*;
 
+@Entity
 public class Task {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String name;
     String description;
     LocalDate deadline;
     Statut  statut = Waiting;
-    int priority =1;
+    Integer priority =1;
 
     public String getName() {
         return name;

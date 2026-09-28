@@ -18,7 +18,6 @@ import static com.bhar.todo_api.models.Statut.Waiting;
 @Service
 public class TaskServices {
     private TaskRepository repo;
-    private int nextId = 1;
 
     public TaskServices(TaskRepository repo){
         this.repo = repo;
@@ -28,29 +27,28 @@ public class TaskServices {
                          LocalDate deadline, Integer priority){
         Task task = new Task();
 
-        task.setId(nextId++);
         task.setName(name);
         if (description!= null && !description.isBlank() ){ task.setDescription(description);}
         if (deadline!= null) {task.setDeadline (deadline);}
         if (priority != null){ task.setPriority(priority);}
 
-        repo.createTask(task);
+        repo.save(task);
         return task;
     }
 
     public Task modifyTask (int id, String name, String description,
                             LocalDate deadline, Integer priority){
-        Task taskToModify = repo.getTaskById(id);//handle the case when it return a null value
+        Task taskToModify = repo.findById(id).orElse(null);
+        if (taskToModify == null){return null;}//handle the case when it return a null value
         if(name!=null && !name.isBlank()) {taskToModify.setName(name);}
         if (description!= null && !description.isBlank() ){ taskToModify.setDescription(description);}
         if (deadline!= null) {taskToModify.setDeadline (deadline);}
         if (priority != null){ taskToModify.setPriority(priority);}
-
-        return taskToModify;
+        return repo.save(taskToModify);
     }
 
     public List<Task> taskList (){
-        List <Task> tasks = repo.getAllTask();
+        List <Task> tasks = repo.findAll();
         // return a sorted task list sorted first by statut,
         // then deadline and finaly priority
         tasks.sort( Comparator.comparing ((Task t)->t.getStatut())
@@ -66,16 +64,17 @@ public class TaskServices {
         // the user can search a task by writing the name or the id
         try{
             int id = parseInt(searchInput);
-            Task task = repo.getTaskById(id);
+            Task task = repo.findById(id).orElse(null);
             if (task != null) {
                 results.add(task);
             }
         } catch (NumberFormatException e){
-            results = repo.getTasksByName(searchInput);
+            results = repo.findByName(searchInput);
         }
         return results;
     }
-    public Task getTask (int id ){ return repo.getTaskById(id);}
+    public Task getTask (int id ){
+        return repo.findById(id).orElse(null);}
 
     public List<Task> filter(String filterInput){
         // the user can filtr the task by priority, deadline,
@@ -83,11 +82,11 @@ public class TaskServices {
 
         try {
             int priority = parseInt(filterInput);
-            results =repo.getTaskByPriority(priority);
+            results =repo.findByPriority(priority);
         } catch (NumberFormatException e){
             try{
                 LocalDate deadline = LocalDate.parse(filterInput);
-                results = repo.getAllTask().stream()
+                results = repo.findAll().stream()
                         .filter(t->t.getDeadline() !=null && t.getDeadline().equals(deadline))
                         .collect(Collectors.toList());
             }catch (DateTimeParseException ex ){
@@ -98,22 +97,28 @@ public class TaskServices {
     }
 
     public void execute(int id){
-        Task task = repo.getTaskById(id);
-        //change a task statut from waiting to finished
+        Task task = repo.findById(id).orElse(null);
+        if (task ==null){
+            return;
+        }
         task.setStatut(Finished);
+        repo.save(task);
     }
 
     public void unexecute(int id){
-        Task task = repo.getTaskById(id);
+        Task task = repo.findById(id).orElse(null);
+        if (task ==null){return ;}
         task.setStatut(Waiting);
+        repo.save(task);
     }
 
     public List<Task> getFinishedTask(){
         //to print the finished task
-        return repo.getTaskByStatut(Finished);
+        return repo.findByStatut(Finished);
     }
-    public List<Task> deleteTask(int id){
-        return repo.deleteTaskById(id);
+
+    public void deleteTask(int id){
+        repo.deleteById(id);
     }
 
 }

@@ -191,18 +191,6 @@ body {
     overflow-y: auto;
 }
 
-.task-list:empty::after {
-    content: "Aucune tâche pour le moment ✨";
-
-    display: block;
-
-    margin-top: 40px;
-
-    color: #666;
-    font-size: 14px;
-    text-align: center;
-}
-
 
 /* =========================
    TASK CARD
@@ -259,58 +247,15 @@ body {
 }
 
 
-/* Checkbox (custom) */
+/* Checkbox */
 
 .task-statut {
-    appearance: none;
-    -webkit-appearance: none;
+    width: 17px;
+    height: 17px;
 
-    width: 20px;
-    height: 20px;
-
-    border: 1.5px solid rgba(224, 170, 85, 0.45);
-    border-radius: 50%;
-
-    background: transparent;
+    accent-color: var(--gold);
 
     cursor: pointer;
-    position: relative;
-
-    transition: 0.25s;
-}
-
-.task-statut:hover {
-    border-color: var(--gold);
-}
-
-.task-statut:checked {
-    background: var(--gold-gradient);
-    border-color: var(--gold);
-}
-
-.task-statut:checked::after {
-    content: "✓";
-
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -55%);
-
-    font-size: 12px;
-    font-weight: bold;
-    color: #0B0B0B;
-}
-
-/* Tâche terminée : titre barré et atténué */
-
-.task-main:has(.task-statut:checked) h2 {
-    color: #888;
-    text-decoration: line-through;
-    text-decoration-color: rgba(224, 170, 85, 0.5);
-}
-
-.task:has(.task-statut:checked) {
-    opacity: 0.6;
 }
 
 
@@ -329,17 +274,8 @@ body {
 .task-actions span {
     margin-right: auto;
 
-    padding: 4px 10px;
-
-    border: 1px solid rgba(224, 170, 85, 0.3);
-    border-radius: 20px;
-
-    background: rgba(224, 170, 85, 0.08);
-    color: var(--light-gold);
-
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
+    color: #aaa;
+    font-size: 13px;
 }
 
 .task-actions button {
@@ -362,23 +298,6 @@ body {
     color: #0B0B0B;
 
     border-color: var(--gold);
-}
-
-.task-actions button:focus-visible,
-.add-task:focus-visible,
-.filter:focus-visible,
-.search input:focus-visible {
-    outline: 2px solid var(--gold);
-    outline-offset: 2px;
-}
-
-/* Bouton supprimer : hover destructif */
-
-.delete-task:hover {
-    background: #E05555 !important;
-    color: #fff !important;
-
-    border-color: #E05555 !important;
 }
 
 

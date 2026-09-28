@@ -57,8 +57,8 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    public List<Task> deleteTask (@PathVariable int id){
-        return services.deleteTask(id);
+    public void deleteTask (@PathVariable int id){
+         services.deleteTask(id);
     }
 
 

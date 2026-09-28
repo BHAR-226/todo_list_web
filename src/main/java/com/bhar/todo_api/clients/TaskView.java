@@ -153,8 +153,8 @@ public class TaskView {
     public void showFinishedTask (){
         showTasks (services.getFinishedTask());
     }
-    public void deleteTask(int id){
-        System.out.println("The task is deleted!");
-        showTasks(services.deleteTask(id));
-    }
+//    public void deleteTask(int id){
+//        System.out.println("The task is deleted!");
+//        showTasks();
+//    }
 }
