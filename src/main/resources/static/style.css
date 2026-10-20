@@ -392,7 +392,8 @@ body {
     background: #0F0F0F;
 }
 
-.task-details > h2 {
+.task-details > h2,
+.task-panel > h2 {
     margin-top: 0;
     margin-bottom: 35px;
 
@@ -516,6 +517,38 @@ body {
 
 
 /* =========================
+   INLINE PANEL (mobile)
+   ========================= */
+
+.task-panel {
+    margin-top: 18px;
+    padding-top: 20px;
+
+    border-top: 1px solid rgba(224, 170, 85, 0.25);
+}
+
+.task-panel > h2 {
+    margin-bottom: 20px;
+
+    font-size: 20px;
+}
+
+.task-panel--add {
+    margin-top: 0;
+    padding: 22px;
+
+    background: #0F0F0F;
+
+    border: 1px solid rgba(224, 170, 85, 0.25);
+    border-radius: 10px;
+}
+
+.task--selected {
+    border-color: var(--gold);
+}
+
+
+/* =========================
    SCROLLBAR
    ========================= */
 
@@ -561,8 +594,11 @@ body {
         grid-template-columns: 1fr;
     }
 
+    .task-details {
+        display: none;
+    }
+
     .task-list {
         border-right: none;
-        border-bottom: 1px solid rgba(224, 170, 85, 0.2);
     }
 }

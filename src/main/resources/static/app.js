@@ -8,6 +8,33 @@ const addButton = document .querySelector(".add-task");
 const filter = document.querySelector(".filter");
 const searchInput = document.querySelector(".search input");
 
+let asideState = { type: null, id: null };
+
+const isMobile = () => window.matchMedia("(max-width: 800px)").matches;
+
+function findTaskElement(id) {
+    return document.querySelector(`.task[data-id="${id}"]`);
+}
+
+function closeTaskPanel(taskElement) {
+    if (!taskElement) return;
+    const panel = taskElement.querySelector(":scope > .task-panel");
+    if (panel) panel.remove();
+    delete taskElement.dataset.panel;
+    taskElement.classList.remove("task--selected");
+}
+
+function openTaskPanel(taskElement, html, kind) {
+    closeTaskPanel(taskElement);
+    const panel = document.createElement("div");
+    panel.className = "task-panel";
+    panel.innerHTML = html;
+    taskElement.appendChild(panel);
+    taskElement.dataset.panel = kind;
+    taskElement.classList.add("task--selected");
+    return panel;
+}
+
 async function loadTasks(){
     const response = await fetch(API_URL);
     tasks = await response.json();
@@ -17,6 +44,7 @@ function displayTask(task){
     const taskElement = document.createElement("article");
     
     taskElement.classList.add("task");
+    taskElement.dataset.id = task.id;
 
     taskElement.innerHTML = `
         <div class="task-main">
@@ -78,8 +106,8 @@ function displayTasks() {
         displayTask(task);
     });
 }
-function showTaskDetails(task){
-    taskDetails.innerHTML = `
+function detailsHtml(task){
+    return `
         <h2>Task Details</h2>
 
         <div class="detail">
@@ -103,9 +131,34 @@ function showTaskDetails(task){
     `;
 }
 
+function showTaskDetails(task){
+    const taskElement = findTaskElement(task.id);
+
+    if (isMobile()) {
+        if (taskElement && taskElement.dataset.panel === "details") {
+            closeTaskPanel(taskElement);
+            return;
+        }
+        if (taskElement) {
+            openTaskPanel(taskElement, detailsHtml(task), "details");
+            return;
+        }
+    }
+
+    if (asideState.type === "details" && asideState.id === task.id) {
+        taskDetails.innerHTML = "";
+        asideState = { type: null, id: null };
+        return;
+    }
+
+    closeTaskPanel(taskElement);
+    taskDetails.innerHTML = detailsHtml(task);
+    asideState = { type: "details", id: task.id };
+}
+
 async function editTask(task) {
 
-    taskDetails.innerHTML = `
+    const formHtml = `
         <h2>Edit Task</h2>
 
         <form class="edit-form">
@@ -135,7 +188,27 @@ async function editTask(task) {
         </form>
     `;
 
-    const form = taskDetails.querySelector(".edit-form");
+    const taskElement = findTaskElement(task.id);
+    let target = taskDetails;
+
+    if (isMobile() && taskElement) {
+        if (taskElement.dataset.panel === "edit") {
+            closeTaskPanel(taskElement);
+            return;
+        }
+        target = openTaskPanel(taskElement, formHtml, "edit");
+    } else {
+        if (asideState.type === "edit" && asideState.id === task.id) {
+            taskDetails.innerHTML = "";
+            asideState = { type: null, id: null };
+            return;
+        }
+        closeTaskPanel(taskElement);
+        taskDetails.innerHTML = formHtml;
+        asideState = { type: "edit", id: task.id };
+    }
+
+    const form = target.querySelector(".edit-form");
     form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const formData = new FormData(form);
@@ -220,7 +293,8 @@ function displayFilteredTasks(filteredTasks) {
     });
 }
 function showAddForm() {
-    taskDetails.innerHTML = `
+
+    const formHtml = `
     <h2>Add Task</h2>
 
         <form class="add-form">
@@ -249,7 +323,31 @@ function showAddForm() {
 
         </form>
         `;
-        const form = taskDetails.querySelector(".add-form");
+
+    let target = taskDetails;
+
+    if (isMobile()) {
+        const existing = taskList.querySelector(":scope > .task-panel--add");
+        if (existing) {
+            existing.remove();
+            return;
+        }
+        const panel = document.createElement("div");
+        panel.className = "task-panel task-panel--add";
+        panel.innerHTML = formHtml;
+        taskList.prepend(panel);
+        target = panel;
+    } else {
+        if (asideState.type === "add") {
+            taskDetails.innerHTML = "";
+            asideState = { type: null, id: null };
+            return;
+        }
+        taskDetails.innerHTML = formHtml;
+        asideState = { type: "add", id: null };
+    }
+
+        const form = target.querySelector(".add-form");
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
 
