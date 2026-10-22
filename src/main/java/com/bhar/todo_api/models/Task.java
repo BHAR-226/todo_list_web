@@ -3,9 +3,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import static com.bhar.todo_api.models.Statut.Waiting;
 import jakarta.persistence.*;
-
+import com.bhar.todo_api.models.User;
 @Entity
 public class Task {
     @Id
@@ -13,10 +15,17 @@ public class Task {
     private int id;
 
     private String name;
-    String description;
+    private String description;
     LocalDate deadline;
-    Statut  statut = Waiting;
-    Integer priority =1;
+    private Statut  statut = Waiting;
+    private Integer priority =1;
+
+    @ManyToOne (fetch = FetchType.LAZY)
+    @JsonIgnore 
+    private User user ;
+
+    public User getUser(){return this.user;}
+    public boid setUser(User user){this.user = user;}
 
     public String getName() {
         return name;
