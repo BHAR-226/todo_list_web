@@ -7,6 +7,33 @@ const taskDetails = document.querySelector(".task-details");
 const addButton = document .querySelector(".add-task");
 const filter = document.querySelector(".filter");
 const searchInput = document.querySelector(".search input");
+const authScreen = document.querySelector(".auth-screen");
+const loginForm = document.querySelector("#login-form");
+const registerForm = document.querySelector("#register-form");
+const authError = document.querySelector("#auth-error");
+const authTabs = document.querySelectorAll(".auth-tab");
+const logoutButton = document.querySelector(".logout");
+
+function showAuth() {
+    authScreen.classList.remove("hidden");
+    taskList.innerHTML = "";
+    taskDetails.innerHTML = "";
+}
+
+function hideAuth() {
+    authScreen.classList.add("hidden");
+    authError.textContent = "";
+}
+
+// fetch that redirects to the auth screen when the session expired
+async function apiFetch(url, options) {
+    const response = await fetch(url, options);
+    if (response.status === 401) {
+        showAuth();
+        throw new Error("unauthorized");
+    }
+    return response;
+}
 
 let asideState = { type: null, id: null };
 
@@ -36,7 +63,7 @@ function openTaskPanel(taskElement, html, kind) {
 }
 
 async function loadTasks(){
-    const response = await fetch(API_URL);
+    const response = await apiFetch(API_URL);
     tasks = await response.json();
     displayTasks()}
 
@@ -74,7 +101,7 @@ function displayTask(task){
 
     statusCheckbox.addEventListener("change", async () => {
         const endpoint = statusCheckbox.checked ? "complete" : "uncomplete";
-        await fetch(`${API_URL}/${task.id}/${endpoint}`, {method: "PATCH"});
+        await apiFetch(`${API_URL}/${task.id}/${endpoint}`, {method: "PATCH"});
         await loadTasks();
     });
     const detailsButton = taskElement.querySelector(".show-details");
@@ -212,7 +239,7 @@ async function editTask(task) {
     form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const formData = new FormData(form);
-    const response = await fetch (`${API_URL}/${task.id}`,
+    const response = await apiFetch (`${API_URL}/${task.id}`,
     {method : "PUT",
     headers : {"Content-Type" : "application/json"},
     body: JSON.stringify({
@@ -230,7 +257,7 @@ async function editTask(task) {
 }
 
 async function deleteTask(id) {
-    await fetch(`${API_URL}/${id}`,
+    await apiFetch(`${API_URL}/${id}`,
     { method : "DELETE"});
 
     await loadTasks();
@@ -359,7 +386,7 @@ function showAddForm() {
                 priority: Number(formData.get("priority")) || null,
                 description: formData.get("description"),
             };
-            const response = await fetch(API_URL,{
+            const response = await apiFetch(API_URL,{
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -372,4 +399,73 @@ function showAddForm() {
         });
 }
 
-loadTasks()
+authTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+        const mode = tab.dataset.mode;
+        authTabs.forEach((t) => t.classList.toggle("active", t === tab));
+        loginForm.classList.toggle("hidden", mode !== "login");
+        registerForm.classList.toggle("hidden", mode !== "register");
+        authError.textContent = "";
+    });
+});
+
+async function submitCredentials(url, form) {
+    const data = new FormData(form);
+    return fetch(url, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            name: data.get("name"),
+            password: data.get("password")
+        })
+    });
+}
+
+loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const response = await submitCredentials("/api/users/login", loginForm);
+    if (response.ok) {
+        hideAuth();
+        await loadTasks();
+    } else if (response.status === 401) {
+        authError.textContent = "Identifiants invalides";
+    } else {
+        authError.textContent = "Connexion impossible";
+    }
+});
+
+registerForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const response = await submitCredentials("/api/users/register", registerForm);
+    if (response.ok) {
+        hideAuth();
+        await loadTasks();
+    } else if (response.status === 409) {
+        authError.textContent = "Ce nom est déjà utilisé";
+    } else {
+        authError.textContent = "Inscription impossible";
+    }
+});
+
+logoutButton.addEventListener("click", async () => {
+    await fetch("/api/users/logout", {method: "POST"});
+    showAuth();
+    loginForm.reset();
+    registerForm.reset();
+});
+
+async function init() {
+    try {
+        const response = await fetch("/api/users/me");
+        if (response.ok) {
+            hideAuth();
+            await loadTasks();
+        } else {
+            showAuth();
+        }
+    } catch (error) {
+        showAuth();
+    }
+}
+
+init()

@@ -1,7 +1,8 @@
 package com.bhar.todo_api.repository;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import org.apache.catalina.User;
+import com.bhar.todo_api.models.User;
 
 @Repository 
 public interface UserRepository extends JpaRepository<User, Integer>{

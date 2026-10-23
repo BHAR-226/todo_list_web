@@ -2,6 +2,7 @@ package com.bhar.todo_api.repository;
 
 import com.bhar.todo_api.models.Statut;
 import com.bhar.todo_api.models.Task;
+import com.bhar.todo_api.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +15,8 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     public List<Task> findByStatut (Statut statu);
     public List<Task> findByPriority(int priority);
     public List<Task> findByName(String searchInput);
+    public List<Task> findByUser(User user);
+    public List<Task> findByUserIsNull();
 //    private List<Task> tasks;
 //
 //    public TaskRepository(List<Task> tasks) {

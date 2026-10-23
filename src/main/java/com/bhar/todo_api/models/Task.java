@@ -1,4 +1,5 @@
 package com.bhar.todo_api.models;
+
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import java.time.LocalDate;
@@ -7,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import static com.bhar.todo_api.models.Statut.Waiting;
 import jakarta.persistence.*;
-import com.bhar.todo_api.models.User;
 @Entity
 public class Task {
     @Id
@@ -25,7 +25,7 @@ public class Task {
     private User user ;
 
     public User getUser(){return this.user;}
-    public boid setUser(User user){this.user = user;}
+    public void setUser(User user){this.user = user;}
 
     public String getName() {
         return name;

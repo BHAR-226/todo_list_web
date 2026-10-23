@@ -1,14 +1,19 @@
-import org.apache.catalina.User;
+package com.bhar.todo_api.services;
+
+import com.bhar.todo_api.models.User;
+import com.bhar.todo_api.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-@Service 
+@Service
 public class UserService {
 
     private UserRepository uRepo;
-    private  final PasswordEncoder encoder = new BcryptPasswordEncoder();
+    private final PasswordEncoder encoder;
 
-    public UserService (UserRepository uRepo){
+    public UserService (UserRepository uRepo, PasswordEncoder encoder){
         this.uRepo= uRepo;
+        this.encoder = encoder;
     }
     public User register ( String name, String rawPassword){
         if (uRepo.existsByName(name)){
@@ -23,8 +28,12 @@ public class UserService {
     public boolean login(String name, String rawPassword){
         User user = uRepo.findByName(name);
         if (user == null) return false;
-        return encoder.matches(rawPassword, user.getPwd_hash());
+        return encoder.matches(rawPassword, user.getPw_hash());
     }
-    
+
+    public User findByName(String name){
+        return uRepo.findByName(name);
+    }
+
     public void logout(){}
 }
